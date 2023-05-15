@@ -29,7 +29,7 @@ python n_queen_solver.py <chromosome_size> <population_size> <epoches>
 - `<population_size>`: The size of the population of chromosomes.
 - `<epoches>`: The number of iterations to train the GA model.
 
-HINT: There is no soluiton for N=1,2,3. Please consider a number larger or equal than 5 for testing. 
+HINT: There is no soluiton for N=1,2,3. Please consider a number larger or equal than 4 for testing. 
 
 ## Functionality
 
