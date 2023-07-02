@@ -2,4 +2,4 @@ numpy
 pandas
 matplotlib
 argparse
-tqdm
+stqdm
