@@ -1,8 +1,17 @@
 import numpy as np
+import streamlit as st
+from stqdm import stqdm
 import matplotlib.pyplot as plt
 import matplotlib.patches as patches
-import argparse
-from tqdm import tqdm
+######################################################################################
+### Initi population #######
+######################################################################################
+def init_population(chromosome_size,population_size):
+    population = []
+    for _ in range(population_size):
+     popul= np.random.permutation(range(1,chromosome_size+1))  # Random permutation of values from 1 to 8
+     population.append(popul)
+    return population
 ##########################################################################################
 ## The method for calculating the fitness of the population
 ###########################################################################################
@@ -26,16 +35,18 @@ def mutation(chrom, chromosome_size):
         chrom_copy[ind1] = chrom_copy[ind2]
         chrom_copy[ind2] = tmp
     return chrom_copy
-##########################################################################################
-## The method for plotting the fitness curve during training the population
-###########################################################################################
+#######################################################################################
+## Fitness curve 
+#######################################################################################
 def fitness_curve_plot(fitnees_curve):
+   st.line_chart(fitnees_curve)
+def fitness_curve_plot2(fitnees_curve):
    fig, ax = plt.subplots()
    n = np.linspace(0,len(fitnees_curve),len(fitnees_curve))
    plt.xlabel('Epoches')
    plt.ylabel('Fitness score')
    plt.plot(n, fitnees_curve,'-o')
-   plt.show()
+   st.pyplot(fig)
 ##########################################################################################
 ## The method for plotting the result, the chess board and the queens
 ###########################################################################################
@@ -65,16 +76,8 @@ def n_queen_plot(chrom,chromosome_size):
     ax.set_xticks([])
     ax.set_yticks([])
     # Show the plot
-    plt.show()
-##########################################################################################
-## The method for initialising the population
-###########################################################################################
-def init_population(chromosome_size,population_size):
-    population = []
-    for _ in range(population_size):
-     popul= np.random.permutation(range(1,chromosome_size+1))  # Random permutation of values from 1 to 8
-     population.append(popul)
-    return population
+    #plt.show()
+    st.pyplot(fig)
 ##########################################################################################
 ## The method for training the population
 ###########################################################################################
@@ -83,7 +86,7 @@ def train_population(population,epoches,chromosome_size):
     ft = []
     success_booelan = False
     population_size = len(population)
-    for i1 in tqdm(range(epoches)):   # 1 should be epoches later 
+    for i1 in stqdm(range(epoches),'Training.....'):   # 1 should be epoches later 
        fitness_score = []
        for i2 in range(population_size):
          fitness_score.append(fitness(population[i2],chromosome_size)) #fitness score initialisation
@@ -107,20 +110,27 @@ def train_population(population,epoches,chromosome_size):
 ## The main body block of the program
 ###########################################################################################
 if __name__ == '__main__':
-        parser = argparse.ArgumentParser(description='Computation of the GA model for finding the n-queen problem.')
-        parser.add_argument('chromosome_size', type=int, help='The size of a chromosome')
-        parser.add_argument('population_size', type=int, help='The size of the population of the chromosomes')
-        parser.add_argument('epoches', type=int, help='The nmber of iterations to traing the GA model')
-        args = parser.parse_args()
-        population = init_population(args.chromosome_size,args.population_size)
-        population, ft, suc_bool = train_population(population,args.epoches,args.chromosome_size)
-        if suc_bool == False:
-            print('!!!!!!!!Opps, the model could not find the solution with te current epoches. Please whether increases them or increase the number of population_size.')
-        fitness_curve_plot(ft)
-        n_queen_plot(population[args.population_size-1],args.chromosome_size)
+    suc_bool = True
+    col1, col2, col3 = st.columns(3)
     
-        
-        
-        
-        
-        
+    with col1:
+     st.title('The N-Queen Demonstration')
+     chromosome_size = st.number_input('Insert chromosome size:')
+     population_size = st.number_input('Insert population size:')
+     epoches = st.number_input('Insert epoches:')
+    population = init_population(int(chromosome_size),int(population_size))
+    population, ft, suc_bool = train_population(population,int(epoches),int(chromosome_size))
+    
+    with col2:
+     fitness_curve_plot2(ft)
+     n_queen_plot(population[int(population_size)-1],int(chromosome_size))
+    
+    with col3:
+      if suc_bool == False:
+        st.text('Trained!')
+        st.text('!!!!!!!!Opps, the model could not find the solution with te current epoches. Please whether increases them or increase the number of population_size.')   
+      else:
+        st.text('Trained!')
+        st.text("Great!!!! We found a solution for you!")
+        st.text("Here is an example:")
+        st.text(population[-1]) 
